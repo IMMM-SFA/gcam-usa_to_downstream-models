@@ -11,7 +11,7 @@ Documentation and scripts for data extraction, formatting, and calculation input
 |Model|Version|
 |---------|------|
 | GCAM-USA | v.5.3 |
-| CERF     | v.2.3 |
+| CERF     | v.2.3.2 |
 
 
 **_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to CERF versions together. Alternative model versions will require modification of queries and calculations.
@@ -136,7 +136,8 @@ This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisf
 * **Example:**
 
 $$ 10 GW * 8760 hours * (1 / 277777.77777777778)= .315 EJ  $$
-    .315 EJ is the EJ-capacity value in the gcam database. By reversing this equation we can determine the starting capacity.
+
+.315 EJ is the EJ-capacity value in the gcam database. By reversing this equation we can determine the starting capacity.
 
 
 ### elec_capacity_factor_usa_in
@@ -160,14 +161,14 @@ $$ 10 GW * 8760 hours * (1 / 277777.77777777778)= .315 EJ  $$
 
 ### elec_fuel_price_2015USDperMBTU
 
-* **Description:** Fuel price for natural gas, oil, coal, and biomass technologies by vintage and region. Biomass ("regional biomass") is provided at the regional level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level. These each need to be mapped to states and to all appropriate technologies. GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. Last, prices must be converted from $/GJ to $/MBTU.
+* **Description:** Fuel price for natural gas, oil, coal, and biomass technologies by vintage and region. Biomass ("regional biomass") is provided at the regional level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level. These each need to be mapped to states and to all appropriate technologies. GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. Last, prices must be converted from $/GJ to $/MBTU. Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm
 * **gcam query:** "prices by sector"
 * **Original units:** 1975USD/GJ
 * **Output units:** $2015USD/MBTU
 * **Calculation:**
 
-        1 MBTU = 10e6 BTU, https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm
-        conv_GJ_to_MBTU = 0.947804, 
+        1 MBTU = 10e6 BTU 
+        conv_GJ_to_MBTU = 0.947804
 
         elec_fuel_price_2015USDperMBTU = (value * gdp_deflator(2015,1975) / conv_GJ_to_MBTU)
 
