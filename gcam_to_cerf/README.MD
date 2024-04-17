@@ -19,6 +19,7 @@ Documentation and scripts for data extraction, formatting, and calculation input
 ## Data Requirements for CERF from GCAM-USA
 
 For every:
+* Scenario
 * Vintage (Vint_{year})
 * Year (x)
 * Technology (class2)
