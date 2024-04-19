@@ -1,4 +1,4 @@
-# GCAM to IM3
+# GCAM-USA to Downstream IM3 Models
 
 ## Description
 
