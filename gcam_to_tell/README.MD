@@ -2,30 +2,30 @@
 
 ## Description
 
-Documentation and scripts for data extraction, formatting, and calculation inputs to TELL from GCAM-USA
+Documentation and scripts for data extraction, formatting, and calculating inputs to TELL from GCAM-USA.
 
 ## Model Versions
 
 |Model|Version|
-|---------|------|
+|:-:|:-:|
 | GCAM-USA | v.5.3 |
-| CERF     | v.1.1 |
+| CERF | v.1.1 |
 
-
-**_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to CERF versions together. Alternative model versions will require modification of queries and calculations.
+**_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to TELL versions 
+together. Alternative model versions will require modification of queries and calculations.
 
 ## Data Requirements for TELL from GCAM-USA
 
 For every:
-* Scenario
+* Scenario (scenario)
 * Year (x)
-* subregion (state)
+* State (region)
 
 TELL needs the following information:
 
-|Source|Description|Output Variable Name|GCAM Query/File Path(s)|Original Units|Output Units|
-|------------------|-------------------|--|--|--|--|
-|GCAM output        | Technology Annual Electricity Consumption by State   |elec_cap_usa_GW                |"elec capacity by tech and vintage"|EJ-Capacity|GW|
+| Source | Description | Output Variable Name | GCAM Query/File Path(s) | Original Units | Output Units |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| GCAM Output | Annual Total Electricity Consumption by State and Sector | energyFinalConsumBySecEJ | "TBD" | EJ | EJ |
 
 
 ### Notes
