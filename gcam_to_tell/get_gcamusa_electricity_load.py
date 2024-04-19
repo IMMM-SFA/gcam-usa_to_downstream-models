@@ -9,55 +9,41 @@ def get_gcam_electricity_load(
   path_to_output_file: str,
   path_to_query_file: str = './queries.xml',
 ):
-  
+
   # create a Path from str
   db_path = Path(path_to_gcam_database)
-  
+
   # create connection to gcam db
   conn = gcamreader.LocalDBConn(db_path.parent, db_path.stem)
-  
+
   # parse the queries file
   queries = gcamreader.parse_batch_query(path_to_query_file)
-  
+
   # run the load query; note that we're assuming it's the first query in the file
   load = conn.runQuery(queries[0])
-  
-  # aggregate the non-transportation load
+
+  # aggregate the load
   aggregated = load[
     (load.input == 'electricity domestic supply') &
-    (load.subsector.isin(['elect_td_bld', 'elect_td_ind']))
   ][['scenario', 'region', 'Year', 'value']].groupby(['scenario', 'region', 'Year']).sum().reset_index().rename(columns={
       'Year': 'x',
   })
-  
+
   # add columns to make output the same as with gcamextractor
   aggregated['subRegion'] = aggregated['region']
   aggregated['param'] = 'energyFinalConsumBySecEJ'
   aggregated['units'] = 'Final Energy by Sector (EJ)'
   aggregated['xLabel'] = 'Year'
   aggregated['vintage'] = 'Vint_' + aggregated['x'].astype(int).astype(str)
-  aggregated['comment'] = '"value" is the aggregated total electricity supply minus transportation electricity supply; "transportation_value" is the total transportation electricity supply'
 
-  # get the transportation load
-  transportation = load[
-    (load.input == 'electricity domestic supply') &
-    (load.subsector == 'elect_td_trn')
-  ][['scenario', 'region', 'Year', 'value']].reset_index(drop=True).rename(columns={
-      'Year': 'x',
-      'value': 'transportation_value'
-  })
-  
-  # merge transportation into the aggregated
-  aggregated = aggregated.merge(transportation[['region', 'x', 'transportation_value']], how='left', on=['region', 'x']).fillna(0)
-  
   # reorder the columns
   aggregated = aggregated[[
-    'scenario', 'region', 'subRegion', 'param', 'xLabel', 'x', 'vintage', 'units', 'value', 'transportation_value', 'comment'
+    'scenario', 'region', 'subRegion', 'param', 'xLabel', 'x', 'vintage', 'units', 'value',
   ]]
-  
+
   # write to csv
   aggregated.to_csv(path_to_output_file, index=False)
-  
+
 
 @click.command()
 @click.option(
@@ -88,8 +74,8 @@ def get_gcam_electricity_load(
 )
 def _get_gcam_electricity_load(path_to_gcam_database, path_to_output_file):
   get_gcam_electricity_load(path_to_gcam_database, path_to_output_file)
-  
-  
+
+
 if __name__ == "__main__":
   _get_gcam_electricity_load()
-  
+
