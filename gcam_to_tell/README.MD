@@ -10,6 +10,7 @@ Documentation and scripts for data extraction, formatting, and calculating input
 |:-:|:-:|
 | GCAM-USA | v.5.3 |
 | CERF | v.1.1 |
+| gcamreader | v1.4 |
 
 **_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to TELL versions 
 together. Alternative model versions will require modification of queries and calculations.
