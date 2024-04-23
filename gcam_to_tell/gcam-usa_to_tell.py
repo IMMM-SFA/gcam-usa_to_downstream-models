@@ -7,7 +7,7 @@ from pathlib import Path
 def get_gcam_electricity_load(
   path_to_gcam_database: str,
   path_to_output_file: str,
-  path_to_query_file: str = './queries.xml',
+  path_to_query_file: str = './gcam-usa_to_tell_queries.xml',
 ):
 
   # create a Path from str
@@ -21,6 +21,8 @@ def get_gcam_electricity_load(
 
   # run the load query; note that we're assuming it's the first query in the file
   load = conn.runQuery(queries[0])
+
+  # TODO update the scenario field to use official IM3 scenario names
 
   # aggregate the load
   aggregated = load[
@@ -61,7 +63,7 @@ def get_gcam_electricity_load(
 )
 @click.option(
     '--path-to-output-file',
-    default='./GODEEEP_GCAM_USA_electricity_load_BAU.csv',
+    default='./gcam-usa_electricity_load.csv',
     type=click.Path(
         file_okay=True,
         dir_okay=False,
