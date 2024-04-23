@@ -26,7 +26,7 @@ def get_gcam_electricity_load(
 
   # aggregate the load
   aggregated = load[
-    (load.input == 'electricity domestic supply') &
+    (load.input == 'electricity domestic supply')
   ][['scenario', 'region', 'Year', 'value']].groupby(['scenario', 'region', 'Year']).sum().reset_index().rename(columns={
       'Year': 'x',
   })
