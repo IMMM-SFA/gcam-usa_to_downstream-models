@@ -8,13 +8,13 @@ Documentation and scripts for data extraction, formatting, and calculation input
 
 ## Model Versions
 
+**_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to CERF versions together. Alternative model versions will require modification of queries and calculations.
+
 |Model|Version|
 |---------|------|
 | GCAM-USA | v.5.3 |
 | CERF     | v.2.3.2 |
 
-
-**_NOTE:_**  The scripts provided in this repository are only applicable to the listed GCAM-USA to CERF versions together. Alternative model versions will require modification of queries and calculations.
 
 ## Data Requirements for CERF from GCAM-USA
 
@@ -23,21 +23,20 @@ CERF requires the following variables:
 | CERF Variable | CERF Variable Name | Description | CERF Required Units |
 |---------------|--------------------|-------------|---------------------|
 | Annual capacity by tech| elec_capacity_usa_GW | Annual capacity installed by technology (inclusive of cooling type), state, vintage, year, and scenario | GW | | |
-| Capacity factor by tech | elec_capacity_factor_usa_in | Investment-level capacity factor by technology (inclusive of cooling type), state, vintage, year, and scenario | fraction | | |
-| Heat rate by tech | elec_heat_rate_BTUperkWh | Heat rate by technology (inclusive of cooling type), state, vintage, year, and scenario | btu/kWh | | |
-| Fuel price by tech | elec_fuel_price_2015USDperMBTU | Fuel price by technology (inclusive of cooling type), state, vintage, year, and scenario | $2015USD/MBTU | | |
-| Variable O&M by tech | elec_variable_om_2015USDperMWh | Variable O&M cost by technology (inclusive of cooling type), state, vintage, year, and scenario | $2015USD/MWh | | |
-|Investment Level Technology Lifetime            |elec_lifetime_yr               | Technology lifetime by technology (inclusive of cooling type), state, vintage, year, and scenario |n_years|
-|Carbon Capture Rate by tech          |elec_carbon_capture_rate_fraction| Carbon capture rate by technology (inclusive of cooling type), state, vintage, year, and scenario  |Fraction |
-|Fuel CO2 Content by tech         | elec_fuel_co2_content_tonsperMBTU| Fuel CO2 content by technology (inclusive of cooling type), state, vintage, year, and scenario  |tons/MBTU|
-|% change in fuel price         |elec_fuel_price_escl_rate_fraction| Percent change in fuel price between year t and t+5 | Fraction | 
-|% change in variable O&M       |elec_variable_om_escl_rate_fraction|Percent change in variable O&M cost between year t and t+5 |Fraction|
+| Capacity factor by tech | elec_capacity_factor_usa_in | Investment-level capacity factor by technology (inclusive of cooling type), state, vintage, and scenario | fraction | | |
+| Heat rate by tech | elec_heat_rate_BTUperkWh | Heat rate by technology (inclusive of cooling type), state, vintage, and scenario | btu/kWh | | |
+| Fuel price by tech | elec_fuel_price_2015USDperMBTU | Fuel price by technology (inclusive of cooling type), state, vintage,and scenario | $2015USD/MBTU | | |
+| Variable O&M by tech | elec_variable_om_2015USDperMWh | Variable O&M cost by technology (inclusive of cooling type), state, vintage, and scenario | $2015USD/MWh | | |
+|Investment Level Technology Lifetime            |elec_lifetime_yr               | Technology lifetime by technology (inclusive of cooling type), state, vintage, and scenario |n_years|
+|Carbon Capture Rate by tech          |elec_carbon_capture_rate_fraction| Carbon capture rate by technology (inclusive of cooling type), state, vintage, and scenario  |Fraction |
+|Fuel CO2 Content by tech         | elec_fuel_co2_content_tonsperMBTU| Fuel CO2 content by technology (inclusive of cooling type), state, vintage, and scenario  |tons/MBTU|
+|% change in fuel price         |elec_fuel_price_escl_rate_fraction| Percent change in fuel price between years | Fraction | 
+|% change in variable O&M       |elec_variable_om_escl_rate_fraction|Percent change in variable O&M cost between years |Fraction|
 
 ### Notes
 
 * Any variables that are provided regionally or nationally need to be mapped to every state and technology type
 * Any variables that are provided by a generic fuel category need to be mapped to each appropriate technology type
-* If a variable does not vary across year then it still needs to appear in each year and vintage
 
 
 ## Expected Output Data Format
@@ -51,8 +50,6 @@ A single .csv file is the expected format of this data extraction effort. The cs
 | region         | gcam region name                  | str | USA                        |
 | subRegion      | state acronym                     | str | AL                         |
 | param          | parameter name                    | str | elec_heat_rate_BTUperkWh   |
-| classLabel1    | describes class1 variable         | str | subsector                |
-| class1         | tech category                     | str | biomass                |
 | classLabel2    | describes class2 variable         | str | technology                |
 | class2         | full tech name with cooling type  | str | biomass (conv) (cooling pond) |
 | xlabel         | describes x variable              | str | Year |
@@ -64,7 +61,7 @@ A single .csv file is the expected format of this data extraction effort. The cs
 
 ## GCAM Regions to States
 
-Some parameters in GCAM are provided on a electricity region basis.
+Some parameters in GCAM are provided on a electricity region basis and need to be mapped to the appropriate states.
 
 * Alaska grid: AK
 * California grid: CA
@@ -90,7 +87,7 @@ $$(year_{desired} - year_{start}) /(year_{base} - year_{start})  $$
 
 This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisfed.org/series/A191RD3A086NBEA
 
-    ```
+    ```python
     def deflate_gdp(year, base_year):
         start_year = 1929
         factors = np.array([
@@ -121,25 +118,18 @@ Electricity capacity by technology (inclusive of cooling type), vintage, subregi
 * elec_cap_usa_GW
 #### CERF required units:
 * Gigawatts (GW)
-#### GCAM-USA Queries: 
-* 
-* 
+#### GCAM-USA Query: 
+* "elec capacity by tech and vintage"
 #### Calculations & Transformations Required:
-* **Unit Conversion** - GCAM-USA provides energy in Exajoules (EJ) which need to be converted to GWh.
+ In the dispatch model, GCAM explicitly tracks capacity. The "elec capacity by tech and vintage" query is this endogenous capacity. Generation is a function of capacity within the model - this capacity is dispatched for each dispatch segment to determine generation. (Generation can't exceed capacity * hours in segment * segment capacity factor, but it can be less than that if the capacity is not fully utilized). So technology capacity factors at each time step are dynamic, although there is a maximum they can't exceed. 
+ 
+ Previously, GCAM only tracked energy in the model, and used generation to back-calculate capacity. But that's no longer the case with the dispatch model. Capacity is endogenous - calculated by the model and written to the database (albeit in 'EJ-capacity' units). The unit "EJ-capacity" is energy for the year at 100% capacity factor to represent capacity. This can be converted to other units by dividing by the number of hours in the year.
 
-        1 GWh = 1 / 277778 EJ 
+ **Unit Conversion:** 
 
+        1 EJ = 277777.7777777778 GWh per year
 
-
-* **Derive Capacity from Energy** - Energy is power over time. Therefore, energy output over a given year is a function of power capacity (GW) multiplied by the number of hours a unit is operating. The number of hours a plant operates in a given year is determined by the product of the plant's capacity factor (cf) and the number of hours in a year (8760). A plant's capacity factor is a value between 0 and 1, where a value of 1 means that it is operating all hours of the year.
-
-        capacity = generation / ( cf * 8760)
-
-* **Example:**
-
-        100000 GWh / (.20 * 8760) = 57 GW
-
-#### Repository Script:
+         conv_EJ_to_GW = 277777.77777777778 / 8760
 
 
 <br>
@@ -148,17 +138,22 @@ _____________
 
 <br>
 
-### 2. Capacity Factor by Technology
-Capacity factor by technology, vintage, subregion, and year. Capacity factor represents the annual power generated divided by the potential output if the plant operated at its rated capacity for a year. GCAM tracks both investment level and actual capacity factor for each technology. The investment-level capacity factor is required for CERF.
+### 2. Capacity Factor
+Capacity factor by technology and subregion for any vintage that has capacity investment for that technology and subregion combination. Capacity factor represents the annual power generated divided by the potential output if the plant operated at its rated capacity for a year. The required capacity factor represents the investment-level expected capacity factor, not the actual realized capacity factor from actual generation output.
 #### CERF Variable Name: 
 * elec_capacity_factor_usa_in
 #### CERF required units:
 * fraction
-#### GCAM-USA Queries: 
-* 
-* 
+#### GCAM-USA Query: 
+* "elec investment capacity factor"
 #### Calculations & Transformations Required:
-#### Repository Script:
+ **Unit Conversion:** 
+
+None
+
+ **Transformations:**
+
+Capacity factors are provided at the investment-segment level. The output capacity factor for CERF takes the average value across all investment segments for each technology and subregion combination.
 
 <br>
 
@@ -167,17 +162,31 @@ _____________
 <br>
 
 ### 3. Heat Rate by Technology 
-Heat rate by technology, vintage, subregion, and year. Heat rate is the amount of energy used by a power plant to generate one kilowatt-hour of electricity. Solar and wind heat rates should have a heat rate value of 0.
+Heat rate by technology, vintage, subregion, and year. Heat rate is the amount of energy (BTU) used by a power plant to generate one kilowatt-hour of electricity. Solar, wind, and geothermal heat rates should have a value of 0. Heat rates should be collected for the following fuel types: 
+
+* nuclearFuelGenII
+* nuclearFuelGenIII
+* refined liquids industrial
+* regional biomass
+* regional coal
+* wholesale gas
 #### CERF Variable Name: 
 * elec_heat_rate_BTUperkWh
 #### CERF required units:
-* btu/kWh
+* BTU/kWh
 #### GCAM-USA Queries: 
-* 
-* 
+* 'elec coeff'
 #### Calculations & Transformations Required:
-#### Repository Script:
+GCAM-USA reports heat rates in EJ in / EJ out ratios. These need to be converted to BTU in / kWh out.
 
+ **Unit Conversion:** 
+
+        BRITISH_THERMAL_UNITS_PER_EXAJOULE = 9.48e14
+        KWH_PER_EXAJOULE = 2.77778e11
+
+        Example:
+
+        1.2 EJ/EJ = (1.2 * BRITISH_THERMAL_UNITS_PER_EXAJOULE) / KWH_PER_EXAJOULE
 
 <br>
 
@@ -192,13 +201,13 @@ Fuel price for natural gas, oil, coal, and biomass for gas-, oil-, coal-, and bi
 #### CERF required units:
 * btu/kWh
 #### GCAM-USA Queries: 
-* 
-* 
+* 'prices of all markets'
+
 #### Calculations & Transformations Required:
 Biomass ("regional biomass") is provided at the regional level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level. These each need to be mapped to states and to all appropriate technologies. 
 
 Prices must be converted from dollars/GJ to dollars/MMBTU (million BTUs). Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm. GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. 
-* **Unit Conversion** 
+**Unit Conversion** 
         
         1 MMBTU = 10e6 BTU 
         1 GJ = .947817 MMBTU
@@ -207,11 +216,10 @@ Prices must be converted from dollars/GJ to dollars/MMBTU (million BTUs). Unit c
 
         elec_fuel_price_1975USDperMBTU = elec_fuel_price_1975USDperGJ * conv_GJ_to_MMBTU
 
-* **1975 to 2015 Dollar Year Conversion** 
+**1975 to 2015 Dollar Year Conversion** 
 
         elec_fuel_price_2015USDperMBTU = (elec_fuel_price_1975USDperMBTU * gdp_deflator(2015,1975))
 
-#### Repository Script:
 
 <br>
 
@@ -226,9 +234,9 @@ Variable operations and maintenance costs by technology, vintage, year, and stat
 * elec_variable_om_2015USDperMWh
 #### CERF required units:
 * btu/kWh
-#### GCAM-USA Queries: 
-* 
-* 
+#### GCAM-USA Query: 
+* 'elec costs by tech and vintage and input'
+
 #### Calculations & Transformations Required:
 Prices must be converted from dollars/GJ to dollars/MWh. GCAM prices are provided in 1975 USD and need to be converted to 2015 USD. 
 * **Unit Conversion** 
@@ -243,7 +251,6 @@ Prices must be converted from dollars/GJ to dollars/MWh. GCAM prices are provide
 
         elec_variable_om_2015USDperMWh = (elec_variable_om_1975USDperMWh * gdp_deflator(2015,1975))
 
-#### Repository Script:
 <br>
 
 _____________
@@ -258,10 +265,9 @@ Expected technology lifetime in years at investment.
 #### CERF required units:
 * n_years
 #### GCAM-USA Exogenous File Path(s): 
-* 
-* 
+* `/pic/projects/im3/gcamusa/gcam-usa-im3/input/gcamdata/outputs/L223.TechLifetime_Dispatch.csv`
 #### Calculations & Transformations Required:
-
+None
 <br>
 
 _____________
@@ -275,9 +281,10 @@ Percent of the carbon dioxide from the power plant that is captured and stored.
 #### CERF required units:
 * fraction
 #### GCAM-USA Exogenous File Path(s): 
-* 
-* 
+* `pic/projects/im3/gcamusa/gcam-usa-im3/input/gcamdata/outputs/L223.TechCarbonCapture_Dispatch.csv`
+
 #### Calculations & Transformations Required:
+No transformations required. Technologies without CCS need to be filled in with a rate of 0.
 
 <br>
 
@@ -292,8 +299,8 @@ The amount of carbon dioxide produced by a fuel in relation to the energy produc
 #### CERF required units:
 * tonsperMBTU
 #### GCAM-USA Exogenous File Path(s): 
-* 
-* 
+* `/pic/projects/im3/gcamusa/gcam-usa-im3/input/gcamdata/outputs/L202.CarbonCoef.csv`
+
 #### Calculations & Transformations Required:
 Values must be converted from kilograms of carbon per GJ to tons per MBTU.
 
