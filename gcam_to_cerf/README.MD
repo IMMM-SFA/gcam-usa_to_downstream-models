@@ -170,12 +170,13 @@ Heat rate by technology, vintage, subregion, and year. Heat rate is the amount o
 * regional biomass
 * regional coal
 * wholesale gas
+
 #### CERF Variable Name: 
 * elec_heat_rate_BTUperkWh
 #### CERF required units:
 * BTU/kWh
 #### GCAM-USA Queries: 
-* 'elec coeff'
+* "elec coefs by tech"
 #### Calculations & Transformations Required:
 GCAM-USA reports heat rates in EJ in / EJ out ratios. These need to be converted to BTU in / kWh out.
 
@@ -187,7 +188,7 @@ GCAM-USA reports heat rates in EJ in / EJ out ratios. These need to be converted
         Example:
 
         1.2 EJ/EJ = (1.2 * BRITISH_THERMAL_UNITS_PER_EXAJOULE) / KWH_PER_EXAJOULE
-
+        = 4095.356 BTU/kWh
 <br>
 
 _____________
