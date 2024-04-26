@@ -36,6 +36,10 @@ def get_heat_rate(
     # heat rate is based on technology and input fuel
     heat_rate = conn.runQuery(get_query_by_name(queries, gcam_query_name))
 
+    # select required fuels
+    fuels = ['nuclearFuelGenII', 'nuclearFuelGenIII', 'refined liquids industrial', 'regional biomass', 'regional coal', 'wholesale gas']
+    heat_rate = heat_rate[heat_rate.input.isin(fuels)]
+
     # convert EJ in per EJ out to BTU in per kwh out
     heat_rate['value'] = (heat_rate['value'] * BRITISH_THERMAL_UNITS_PER_EXAJOULE) / KWH_PER_EXAJOULE
 
