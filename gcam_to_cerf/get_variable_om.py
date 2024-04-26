@@ -84,8 +84,44 @@ def get_variable_om(
     else:
        pass
 
+    # calculate variable O&M escalation between years
+    vom_escalation_rate = variable_om[['subRegion', 'class2', 'vintage', 'x', 'value']].copy()
 
-    return variable_om
+    # sort values by state, technology, vintage, and year
+    vom_escalation_rate = vom_escalation_rate.sort_values(by=['subRegion', 'class2', 'vintage', 'x'])
+
+    # collect previous year
+    vom_escalation_rate['y'] = vom_escalation_rate['x'] - vom_escalation_rate.groupby(['subRegion', 'class2'])['x'].diff()
+
+    # rename values
+    df = variable_om[['subRegion', 'class2', 'vintage', 'x', 'value']].copy()
+    df = df.rename(columns={'value':'value_t_5', 'x':'y'})[['subRegion', 'y', 'class2', 'value_t_5']]
+
+    # merge dataframes
+    vom_escalation_rate = vom_escalation_rate.merge(df, how='left', on=['subRegion','class2', 'y'])
+
+    # calculate escalation rate
+    vom_escalation_rate['esc_val'] = (vom_escalation_rate['value'] - vom_escalation_rate['value_t_5'] ) / vom_escalation_rate['value_t_5']
+
+    # fill in zero for technologies with variable O&M of 0
+    vom_escalation_rate['esc_val'] = np.where((vom_escalation_rate['value']==0) & (vom_escalation_rate['value_t_5']==0), 0, vom_escalation_rate['esc_val'])
+    vom_escalation_rate = vom_escalation_rate.drop(['value'], axis=1) 
+
+    # transform to expected format
+    vom_escalation_rate = standardize_format(vom_escalation_rate, param='elec_variable_om_escl_rate_fraction',
+                                scenario=gcam_scenario,
+                                units='fraction', 
+                                valueColumn='esc_val', vintageColumn='x')
+
+    #fill first year values with 0
+    vom_escalation_rate['value'].fillna(0, inplace=True)
+
+    if save_output:
+        vom_escalation_rate.to_csv(Path(f'./extracted_data/{gcam_scenario}_variable_om_esc_rate.csv'), index=False)
+    else:
+       pass
+
+    return variable_om, vom_escalation_rate
 
 def _get_variable_om(
         path_to_gcam_database,
