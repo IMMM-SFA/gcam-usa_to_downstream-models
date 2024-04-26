@@ -47,5 +47,5 @@ following column names:
 | param     | Parameter name        | str | elecFinalBySecTWh        |
 | x         | Year                  | int | 1975                     |
 | units     | Variable units        | str | Final Electricity by Sector (TWh) |
-| value     | Year                  | flt | 0.510867688888893        |
+| value     | Annual state-level total electricity demand | flt | 0.510867688888893 |
 
