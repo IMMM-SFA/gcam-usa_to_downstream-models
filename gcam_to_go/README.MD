@@ -18,19 +18,12 @@ Documentation and scripts for data extraction, formatting, and calculation input
 
 ## Data Requirements for GO from GCAM-USA
 
-For every:
-* Scenario 
-* Vintage (Vint_{year})
-* Year (x)
-* Technology (class2)
-* subregion (state)
-
 GO needs the following information:
 
-|Source|Description|Output Variable Name|GCAM Query/File Path(s)|Original Units|Output Units|
-|------------------|-------------------|--|--|--|--|
-|GCAM output        |Technology Heat Rate           |elec_heat_rate_BTUperkWh       |"elec coeff"                       |?|btu/kWh|
-|GCAM output        |Technology Fuel Price          |elec_fuel_price_2015USDperMBTU |"prices by sector"                 |1975USD/GJ|$2015USD/MBTU|
+| GO Variable | GO Variable Name | Description | GO Required Units |
+|---------------|--------------------|-------------|---------------------|
+| Heat rate by tech | elec_heat_rate_BTUperkWh | Heat rate by technology (inclusive of cooling type), state, vintage, and scenario | btu/kWh | | |
+| Fuel price by tech | elec_fuel_price_2015USDperMBTU | Fuel price by fuel type, state, vintage, and scenario | $2015USD/MBTU | | |
 
 
 ## Expected Output Data Format
@@ -46,8 +39,6 @@ A single .csv file is the expected format of this data extraction effort. The cs
 | param          | parameter name                    | str | elec_heat_rate_BTUperkWh   |
 | classLabel1    | describes class1 variable         | str | subsector                |
 | class1         | tech category                     | str | biomass                |
-| classLabel2    | describes class2 variable         | str | technology                |
-| class2         | full tech name with cooling type  | str | biomass (conv) (cooling pond) |
 | xlabel         | describes x variable              | str | Year |
 | x              | year of parameter value           | int | 2025 |
 | vintage        | gcam simulation year of parameter | str | Vint_2020 |
@@ -119,7 +110,9 @@ This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisf
 
 ### elec_fuel_price_2015USDperMBTU
 
-* **Description:** Fuel price for natural gas, oil, coal, and biomass technologies by vintage and region. Biomass ("regional biomass") is provided at the regional level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level. These each need to be mapped to states and to all appropriate technologies. GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. Last, prices must be converted from $/GJ to $/MBTU. Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm
+* **Description:** Fuel price for natural gas, oil, coal, nuclear, and biomass by vintage and state. Biomass ("regional biomass") is provided at the state level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level, nuclear fuel is provided at the US aggregate level. These each need to be mapped to individual states. 
+
+GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. Last, prices must be converted from $/GJ to $/MBTU. Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm
 * **gcam query:** "prices by sector"
 * **Original units:** 1975USD/GJ
 * **Output units:** $2015USD/MBTU
