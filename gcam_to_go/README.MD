@@ -113,7 +113,7 @@ This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisf
 * **Description:** Fuel price for natural gas, oil, coal, nuclear, and biomass by vintage and state. Biomass ("regional biomass") is provided at the state level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level, nuclear fuel is provided at the US aggregate level. These each need to be mapped to individual states. 
 
 GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. Last, prices must be converted from $/GJ to $/MBTU. Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm
-* **gcam query:** "prices by sector"
+* **gcam query:** 'prices of all markets'
 * **Original units:** 1975USD/GJ
 * **Output units:** $2015USD/MBTU
 * **Calculation:**
