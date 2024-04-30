@@ -3,11 +3,12 @@ import gcamreader
 import pandas as pd
 from pathlib import Path
 
+EXAJOULES_TO_TERAWATT_HOURS = 277.77777777778
 
 def get_gcam_electricity_load(
   path_to_gcam_database: str,
   path_to_output_file: str,
-  path_to_query_file: str = './gcam-usa_to_tell_queries.xml',
+  path_to_query_file: str = './gcamusa_to_tell_queries.xml',
 ):
 
   # create a Path from str
@@ -25,18 +26,23 @@ def get_gcam_electricity_load(
   # TODO update the scenario field to use official IM3 scenario names
 
   # aggregate the load
-  aggregated = load[
-    (load.input.str.startswith('electricity domestic supply'))
-  ][['scenario', 'region', 'Year', 'value']].groupby(['scenario', 'region', 'Year']).sum().reset_index().rename(columns={
+  aggregated = load[[
+      'scenario', 'region', 'Year', 'value'
+  ]].groupby(['scenario', 'region', 'Year']).sum().reset_index().rename(columns={
       'Year': 'x',
   })
 
+  # convert exajoules to terawatt hours
+  aggregated['value'] = aggregated['value'] * EXAJOULES_TO_TERAWATT_HOURS
+
   # add columns to make output the same as with gcamextractor
   aggregated['subRegion'] = aggregated['region']
-  aggregated['param'] = 'energyFinalConsumBySecEJ'
-  aggregated['units'] = 'Final Energy by Sector (EJ)'
+  aggregated['region'] = 'USA'
+  aggregated['param'] = 'elecFinalBySecTWh'
+  aggregated['units'] = 'Final Electricity by Sector (TWh)'
   aggregated['xLabel'] = 'Year'
   aggregated['vintage'] = 'Vint_' + aggregated['x'].astype(int).astype(str)
+
 
   # reorder the columns
   aggregated = aggregated[[

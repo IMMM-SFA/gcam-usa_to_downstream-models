@@ -53,12 +53,12 @@
     <region name = "WV"/>
     <region name = "WY"/>
     <supplyDemandQuery title="inputs by tech">
-      <axis1 name="input">input</axis1>
-      <axis2 name="Year">demand-physical[@vintage]</axis2>
-      <xPath buildList="true" dataName="input" group="false" sumAll="false">
-        *[@type='sector']/*[@type='subsector']/*[@type='technology']/*[@type='input']/demand-physical/node()
-      </xPath>
-      <comments/>
+        <axis1 name="input">input</axis1>
+        <axis2 name="Year">demand-physical[@vintage]</axis2>
+        <xPath buildList="true" dataName="input" group="false" sumAll="true">
+        *[@type='sector' (: collapse :)]/*[@type='subsector' (: collapse :)]/*[@type='technology' (: collapse :)]/*[@type='input' and starts-with(@name, 'electricity domestic supply')]/demand-physical/node()
+        </xPath>
+        <comments/>
     </supplyDemandQuery>
   </aQuery>
 </queries>
