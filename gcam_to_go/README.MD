@@ -18,13 +18,6 @@ Documentation and scripts for data extraction, formatting, and calculation input
 
 ## Data Requirements for GO from GCAM-USA
 
-For every:
-* Scenario 
-* Vintage (Vint_{year})
-* Year (x)
-* Technology (class2)
-* subregion (state)
-
 GO needs the following information:
 
 |Source|Description|Output Variable Name|GCAM Query/File Path(s)|Original Units|Output Units|
@@ -109,12 +102,19 @@ This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisf
 
 ### elec_heat_rate_BTUperkWh
 
-* **Description:** Heat rate by technology, vintage, subregion, and year. Solar and wind heat rates should have a value of 0.
-* **gcam query:** "elec coeff"    
+* **Description:** Heat rate by technology, vintage, and state. GCAM-USA reports heat rates in EJ in / EJ out ratios. These need to be converted to BTU in / kWh out.
+
+* **gcam query:** "elec coefs by tech"   
 * **Original units:** 
 * **Output units:** btu/kWh
 * **Calculation:** 
+    BRITISH_THERMAL_UNITS_PER_EXAJOULE = 9.48e14
+    KWH_PER_EXAJOULE = 2.77778e11
 
+    Example:
+
+        1.2 EJ/EJ = (1.2 * BRITISH_THERMAL_UNITS_PER_EXAJOULE) / KWH_PER_EXAJOULE
+        = 4095.356 BTU/kWh
 
 
 ### elec_fuel_price_2015USDperMBTU
