@@ -43,7 +43,7 @@ def get_capacity_factor(
     capacity_factor = capacity_factor[['region','technology', 
                                        'capacity_factor','year']].groupby(['region', 'technology','year'], as_index=False).mean()
 
-    # collect vintage from year
+    # collect vintage from year. Given that the query is for investment technologies, the vintage will be the same as the year
     capacity_factor['vintage'] = capacity_factor['year']
 
     # transform to cerf expected format
