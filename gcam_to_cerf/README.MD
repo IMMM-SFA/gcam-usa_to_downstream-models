@@ -113,7 +113,8 @@ This time series is the BEA "A191RD3A086NBEA" product from https://fred.stlouisf
 ## Output Variable Details
 
 ### 1. Capacity by Technology Type
-Electricity capacity by technology (inclusive of cooling type), vintage, subregion, and year. 
+Electricity capacity by technology (inclusive of cooling type), vintage, subregion, and year. Note that new projected GCAM-USA capacity additions begin in vintage 2020. All pre-existing capacity (i.e., anything installed prior to GCAM-USA simulations) is redeployed as part of the 2015 vintage. Vintages <= 2015 should not be interpreted the same way as vintages >= 2020
+
 #### CERF Variable Name: 
 * elec_cap_usa_GW
 #### CERF required units:
