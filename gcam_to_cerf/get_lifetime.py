@@ -33,7 +33,7 @@ def get_lifetime(
         print('All required values available')
     else:
         for index, row in lifetime[lifetime.value.isna()].iterrows():
-            print(f"WARNING: Heat Rate for {row['subRegion']}, {row['class2']}, {row['vintage']} is missing\n") 
+            print(f"WARNING: Lifetime for {row['subRegion']}, {row['class2']}, {row['vintage']} is missing\n") 
 
     if save_output:
         os.makedirs(Path('./extracted_data'), exist_ok=True)
