@@ -303,7 +303,7 @@ The amount of carbon dioxide produced by a fuel in relation to the energy produc
 * `/pic/projects/im3/gcamusa/gcam-usa-im3/input/gcamdata/outputs/L202.CarbonCoef.csv`
 
 #### Calculations & Transformations Required:
-Values must be converted from kilograms of carbon per GJ to tons per MBTU.
+Values must be converted from kilograms of carbon per GJ to tons per MBTU. Values are available on a fuel type basis at the USA level. These need to be mapped to individual technologies by fuel type and to each US state that sees new capacity in each vintage.
 
 * **Unit Conversion** 
 
