@@ -144,16 +144,18 @@ Capacity factor by technology and subregion for any vintage that has capacity in
 * elec_capacity_factor_usa_in
 #### CERF required units:
 * fraction
-#### GCAM-USA Query: 
+#### GCAM-USA Queries: 
 * "elec investment capacity factor"
+* "elec investment by investment segment (energy)"
 #### Calculations & Transformations Required:
+
  **Unit Conversion:** 
 
 None
 
  **Transformations:**
 
-Capacity factors are provided at the investment-segment level. The output capacity factor for CERF takes the average value across all investment segments for each technology and subregion combination.
+Capacity factor is provided at the state, year, technology, and investment segment (e.g., baseload) level. To obtain an accurate representation of capacity factor by technology, we calculate a capacity factor that is weighted by the amount of generation in each generation segment for each technology/state/year combination. In some cases, a technology will have new capacity in a given year/state combination but will not have a capacity factor value because there is no investment level generation for that combination. To fill these values in, we first take the average of the calculated weighted average capacity factor across all years for each state/technology combination and fill in missing values with these. For any remaining missing values, they are filled in with the average of the weighted average capacity factor across all years and states for each technology.
 
 <br>
 
