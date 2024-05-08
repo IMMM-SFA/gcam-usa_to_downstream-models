@@ -349,5 +349,21 @@ The escalation rate of variable O&M prices for each technology between years. Th
 
      Escalation Rate = (VOM_t - VOM_t-5) / VOM_t-5
 
+_____________
 
+<br>
 
+### 10. Carbon Price by Year
+The cost incurred per ton of carbon for fossil-fuel generation technologies.
+#### CERF Variable Name: 
+* carbon_price_2015USDperTonCarbon
+#### CERF required units:
+* $2015/tonCarbon
+#### Calculations & Transformations Required:
+GCAM prices are provided in 1990 USD and need to be converted to 2015 USD. Carbon price is provided as a global variable by year. This needs to be mapped to all technologies, states, and years with new capacity.
+* **Unit Conversion** 
+
+None
+* **1975 to 2015 Dollar Year Conversion** 
+
+        carbon_price_2015USDperTonCarbon = (carbon_price_1990USDperTonCarbon * gdp_deflator(2015,1990))
