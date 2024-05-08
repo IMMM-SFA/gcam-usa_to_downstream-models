@@ -196,7 +196,7 @@ _____________
 <br>
 
 ### 4. Fuel Price by Technology
-Fuel price for natural gas, oil, coal, and biomass for gas-, oil-, coal-, and biomass- fired technologies. 
+Fuel price for natural gas, oil, coal, nuclear, and biomass for gas-, oil-, coal-, and biomass- fired technologies by region and vintage. 
 #### CERF Variable Name: 
 * elec_fuel_price_2015USDperMBTU
 #### CERF required units:
@@ -205,7 +205,7 @@ Fuel price for natural gas, oil, coal, and biomass for gas-, oil-, coal-, and bi
 * 'prices of all markets'
 
 #### Calculations & Transformations Required:
-Biomass ("regional biomass") is provided at the regional level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level. These each need to be mapped to states and to all appropriate technologies. 
+Biomass ("regional biomass") is provided at the state level, fossil fuels ("refined liquids industrial", "regional coal", and "wholesale gas") are provided at the grid region level, and nuclear fuels (nuclearFuelGenII, nuclearFuelGenIII) are provided at the aggregate US level. These each need to be mapped to states and to all appropriate technologies. 
 
 Prices must be converted from dollars/GJ to dollars/MMBTU (million BTUs). Unit conversion from https://www.unitconverters.net/energy/gigajoule-to-mega-btu-it.htm. GCAM prices are provided in 1975 USD and need to be scaled to 2015 USD. 
 **Unit Conversion** 
