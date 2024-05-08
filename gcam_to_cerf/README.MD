@@ -364,6 +364,6 @@ GCAM prices are provided in 1990 USD and need to be converted to 2015 USD. Carbo
 * **Unit Conversion** 
 
 None
-* **1975 to 2015 Dollar Year Conversion** 
+* **1990 to 2015 Dollar Year Conversion** 
 
         carbon_price_2015USDperTonCarbon = (carbon_price_1990USDperTonCarbon * gdp_deflator(2015,1990))
