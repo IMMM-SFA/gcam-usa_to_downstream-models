@@ -1,69 +1,62 @@
-import gcamreader
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from standardize_output_format import *
+from region_to_states import *
 import os
 
-
-def get_query_by_name(queries, name):
-    return next((x for x in queries if x.title == name), None)
-
+# get a list of all available states
+ALL_STATES = sorted([s for states in REGION_TO_STATES.values() for s in states])
 
 def get_heat_rate(
-    path_to_gcam_database:str,
-    gcam_file_name:str,
+    gcam_input_data_dir:str,
     gcam_scenario:str,
     capacity_crosscheck:pd.DataFrame,
     save_output=False,
-    gcam_query_name = "elec coefs by tech",
-    path_to_query_file: str = './elec_queries.xml',
+    gcam_data_file_name = "L223.TechEff_Dispatch.csv",
     ):
 
     # set up unit conversions
     BRITISH_THERMAL_UNITS_PER_EXAJOULE = 9.48e14
     KWH_PER_EXAJOULE = 2.77778e11
 
-    # create a Path from str
-    db_path = Path(path_to_gcam_database)
+    # read in exogenous heat rate file
+    heat_rate = pd.read_csv(Path(f'{gcam_input_data_dir}/{gcam_data_file_name}'), skiprows=1)
 
-    # create connection to gcam db
-    conn = gcamreader.LocalDBConn(db_path, gcam_file_name)
-
-    # parse the queries file
-    queries = gcamreader.parse_batch_query(path_to_query_file)
-
-    # heat rate is based on technology and input fuel
-    heat_rate = conn.runQuery(get_query_by_name(queries, gcam_query_name))
-
-    # select required fuels
+    # reduce to needed fuels
     fuels = ['nuclearFuelGenII', 'nuclearFuelGenIII', 'refined liquids industrial', 'regional biomass', 'regional coal', 'wholesale gas']
-    heat_rate = heat_rate[heat_rate.input.isin(fuels)]
+    heat_rate = heat_rate[heat_rate['minicam.energy.input'].isin(fuels)]
+
+    # convert from efficiency to I-O coefficient
+    heat_rate['value'] = 1 / heat_rate['efficiency']
+
+    # collect vintage
+    heat_rate['vintage'] = heat_rate['year']
 
     # convert EJ in per EJ out to BTU in per kwh out
     heat_rate['value'] = (heat_rate['value'] * BRITISH_THERMAL_UNITS_PER_EXAJOULE) / KWH_PER_EXAJOULE
-
-    # collect vintage
-    heat_rate['vintage'] = heat_rate['Year']
 
     # rename columns
     heat_rate.rename(columns={
         'Units': 'units',
         'Year': 'year',
-        'input': 'fuel_type',
+        'minicam.energy.input': 'fuel_type',
         'value': 'heat_rate_BTUperkWh',
     }, inplace=True)
 
     # reduce columns
     heat_rate = heat_rate[['year', 'vintage', 'region', 'technology', 'fuel_type', 'heat_rate_BTUperkWh']].reset_index(drop=True)
 
+    # remove non-USA subRegions
+    heat_rate = heat_rate[heat_rate.region.isin(ALL_STATES)]
+
     # create a list of fuels by technology that can be used for collecting fuel prices 
     tech_to_fuel = heat_rate[['technology', 'fuel_type']].copy().drop_duplicates(ignore_index=True)
 
-    # transform to expected cerf format
+    # transform to expected format
     heat_rate = standardize_format(heat_rate, param='elec_heat_rate_BTUperkWh', scenario=gcam_scenario, 
                                 units='Heat Rate (BTU per kWh)', valueColumn='heat_rate_BTUperkWh')
-    
+
     # validate against new capacity deployments by vintage
     heat_rate = pd.merge(capacity_crosscheck, heat_rate, how='left', on=['scenario','region' ,'subRegion','xLabel', 'x', 'vintage', 'class2'])
 
@@ -74,6 +67,7 @@ def get_heat_rate(
     heat_rate['param'].fillna('elec_heat_rate_BTUperkWh', inplace=True)
     heat_rate['classLabel2'].fillna('technology', inplace=True)
     heat_rate['units'].fillna('Heat Rate (BTU per kWh)', inplace=True)
+
 
     # print any missing values
     if heat_rate[heat_rate.value.isna()].empty:
@@ -92,15 +86,13 @@ def get_heat_rate(
 
 
 def _get_heat_rate(
-      path_to_gcam_database,
-      gcam_file_name,
-      gcam_scenario
+        gcam_input_data_dir,
+        gcam_scenario
       ):
   
   get_heat_rate(
-      path_to_gcam_database,
-      gcam_file_name,
-      gcam_scenario
+        gcam_input_data_dir,
+        gcam_scenario
       )
 
 
