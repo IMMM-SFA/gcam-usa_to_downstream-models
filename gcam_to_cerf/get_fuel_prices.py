@@ -141,52 +141,7 @@ def get_fuel_prices(
     else:
        pass
 
-    # calculate fuel price escalation between years
-    fuel_escalation_rate = prices[['subRegion', 'class2', 'vintage', 'x', 'value']].copy()
-
-    # sort values
-    fuel_escalation_rate = fuel_escalation_rate.sort_values(by=['subRegion', 'class2', 'vintage', 'x'])
-
-    # collect the previous year of available fuel price for given technology and state combination
-    fuel_escalation_rate['y'] = fuel_escalation_rate['x'] - fuel_escalation_rate.groupby(['subRegion', 'class2'])['x'].diff()
-
-    # create a copy of fuel price dataframe and rename values
-    df = prices[['subRegion', 'class2', 'vintage', 'x', 'value']].copy()
-    df = df.rename(columns={'value':'value_t_5', 'x':'y'})
-    df = df.sort_values(by=['subRegion', 'class2', 'vintage', 'y'])
-    df = df[['subRegion', 'y', 'class2', 'value_t_5']]
-
-    # combine dataframes
-    fuel_escalation_rate = fuel_escalation_rate.merge(df, how='left', on=['subRegion','class2', 'y'])
-
-    # calculate escalation rate
-    fuel_escalation_rate['esc_val'] = (fuel_escalation_rate['value'] - fuel_escalation_rate['value_t_5'] ) / fuel_escalation_rate['value_t_5']
-    
-    # adjust growth rates for cases where negative growth returns a positive value
-    fuel_escalation_rate['esc_val'] = np.where((fuel_escalation_rate['value'] < 0) & 
-                                               (fuel_escalation_rate['value_t_5'] < 0) & 
-                                               (fuel_escalation_rate['value'] < fuel_escalation_rate['value_t_5']), 
-                                               fuel_escalation_rate['esc_val'] * -1,
-                                               fuel_escalation_rate['esc_val'])
-    
-    fuel_escalation_rate = fuel_escalation_rate.drop(['value'], axis=1) 
-
-    # transform to expected cerf format
-    fuel_escalation_rate = standardize_format(fuel_escalation_rate, param='fuel_price_escalation_rate_fraction',
-                                scenario=gcam_scenario,
-                                units='fraction', 
-                                valueColumn='esc_val', vintageColumn='x')
-    
-    # fill first year values (which have no previous year to calculate from) with zero
-    fuel_escalation_rate['value'].fillna(0, inplace=True)
-
-    if save_output:
-        os.makedirs(Path('./extracted_data'), exist_ok=True)
-        fuel_escalation_rate.to_csv(Path(f'./extracted_data/{gcam_scenario}_fuel_price_esc_rate.csv'), index=False)
-    else:
-       pass
-
-    return prices, fuel_escalation_rate
+    return prices
 
 
 def _get_fuel_prices(      
