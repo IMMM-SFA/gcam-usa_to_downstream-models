@@ -43,6 +43,9 @@ def get_carbon_price(
     # map to new capacity rows by year to apply to all technologies, all states, and all years
     carbon_price = pd.merge(capacity_crosscheck, carbon_price, how='left', on=['x'])
 
+    # fill in missing carbon prices with zero for scenarios and/or model years which do not have a carbon policy active.
+    carbon_price['value'].fillna(0, inplace=True)
+
     # fill in missing columns
     carbon_price['units'] = 'Carbon Price (2015 USD/tonCarbon)'
     carbon_price['param'] = 'carbon_price_2015USDperTonCarbon'
