@@ -26,7 +26,8 @@ def get_lifetime(
                                     units='lifetime (yr)', valueColumn='lifetime', vintageColumn='year')
 
     # validate against new capacity deployments by vintage
-    lifetime = pd.merge(capacity_crosscheck, lifetime, how='left', on=['subRegion', 'class2']) 
+    lifetime = pd.merge(capacity_crosscheck, lifetime, how='left', 
+                        on=['scenario','region' ,'subRegion','xLabel', 'x', 'vintage', 'class2']) 
 
     # print any missing values
     if lifetime[lifetime.value.isna()].empty:
