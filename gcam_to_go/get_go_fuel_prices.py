@@ -2,7 +2,6 @@ import gcamreader
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from standardize_output_format import *
 from gdp_deflator import *
 from region_to_states import *
 import os
@@ -111,18 +110,20 @@ def get_go_fuel_prices(
     prices['units'] = 'Fuel Cost (2015 USD/MBTU)'
     prices['region'] = 'USA'
     prices['scenario']  = gcam_scenario
-    prices['vintage'] = prices['x']
-    prices['xlabel'] = 'year'
+    prices['vintage'] = 'Vint_' + prices['x'].astype(str)
+    prices['xLabel'] = 'Year'
     prices['classLabel1'] = 'sector'
 
     # select output 
-    prices = prices[['scenario', 'region', 'subRegion', 'param', 'classLabel1', 'class1', 'xlabel', 'x', 'vintage', 'units', 'value']]
+    prices = prices[['scenario', 'region', 'subRegion', 'param', 'classLabel1', 'class1', 'xLabel', 'x', 'vintage', 'units', 'value']]
 
     if save_output:
         os.makedirs(Path('./extracted_data'), exist_ok=True)
         prices.to_csv(Path(f'./extracted_data/{gcam_scenario}_go_fuel_prices.csv'), index=False)
     else:
        pass
+
+    return prices
 
 def _get_go_fuel_prices(      
         path_to_gcam_database,
