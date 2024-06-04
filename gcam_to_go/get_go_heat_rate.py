@@ -56,12 +56,12 @@ def get_go_heat_rate(
     heat_rate['region'] = 'USA'
     heat_rate['scenario']  = gcam_scenario
     heat_rate['vintage'] = heat_rate['x']
-    heat_rate['xlabel'] = 'year'
+    heat_rate['xLabel'] = 'year'
     heat_rate['classLabel2'] = 'technology'
 
     # reduce columns
     heat_rate = heat_rate[['scenario', 'region', 'subRegion', 'param', 'classLabel2' ,
-                        'class2', 'xlabel', 'x', 'vintage', 'units', 'value']].reset_index(drop=True)
+                        'class2', 'xLabel', 'x', 'vintage', 'units', 'value']].reset_index(drop=True)
 
     if save_output:
         os.makedirs(Path('./extracted_data'), exist_ok=True)
